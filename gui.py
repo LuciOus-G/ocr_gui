@@ -96,8 +96,12 @@ class App(QMainWindow):
             list_data.append(dats[-2].replace('x', '*').replace('X', '*').encode('utf-8'))
 
         for final in list_data:
-            x = eval(final)
-            list_result.append(f"Hasil dari perhutingan {str(final)} adalah = {str(x)}")
+            try:
+                x = eval(final)
+                list_result.append(f"""Hasil dari perhitungan {str(final).replace('b', '').replace("'", '')} adalah = {str(x)}""")
+            except:
+                x = "Gambar tidak di ketahui, coba snip ulang"
+                list_result.append(x)
             print(x)
         result = '\n'.join(str(x) for x in list_result)
         self.textbox.setText(result)
