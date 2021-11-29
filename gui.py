@@ -31,7 +31,6 @@ class App(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle("LaTeX OCR")
-        # QApplication.setWindowIcon(QtGui.QIcon(':/icons/icon.svg'))
         self.left = 500
         self.top = 300
         self.width = 900
@@ -45,7 +44,6 @@ class App(QMainWindow):
 
         # Create textbox
         self.textbox = QTextEdit(self)
-        # self.textbox.textChanged.connect(self.displayPrediction)
         self.textbox.setMinimumHeight(40)
         self.textbox.setFontPointSize(18)
 
@@ -115,7 +113,6 @@ class App(QMainWindow):
         self.retryButton.setEnabled(False)
 
         self.show()
-                                                                               #    3 * 3
 class SnipWidget(QMainWindow):
     isSnipping = False
 
