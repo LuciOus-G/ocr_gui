@@ -94,15 +94,20 @@ class App(QMainWindow):
 
         for dats in data_new:
             list_data.append(dats[-2].replace('x', '*').replace('X', '*').encode('utf-8'))
-
         for final in list_data:
             try:
+                if len(list_data) != 1:
+                    final = f'{list_data[0]}{list_data[1]}'.replace('b', '').replace("'", '')
+                    if ('-', '+', '*', '/') not in final:
+                        raise Exception("Gambar tidak di ketahui, coba snip ulang")
                 x = eval(final)
                 list_result.append(f"""Hasil dari perhitungan {str(final).replace('b', '').replace("'", '')} adalah = {str(x)}""")
             except:
                 x = "Gambar tidak di ketahui, coba snip ulang"
+                xx = 'Atau coba hilangkan spasi di antara angka dan aritmatik'
                 list_result.append(x)
-            print(x)
+                list_result.append(xx)
+                break
         result = '\n'.join(str(x) for x in list_result)
         self.textbox.setText(result)
 
