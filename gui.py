@@ -64,6 +64,7 @@ class App(QMainWindow):
         centralWidget.setMinimumWidth(200)
         self.setCentralWidget(centralWidget)
 
+        # show all widget in window app
         lay = QVBoxLayout(centralWidget)
         lay.addWidget(self.webView, stretch=4)
         lay.addWidget(self.textbox, stretch=2)
@@ -74,32 +75,43 @@ class App(QMainWindow):
         settings = QFormLayout()
         lay.addLayout(settings)
 
-    @pyqtSlot()
+    # when button snip is clicked, button will call onClick function
+    @pyqtSlot() # to run serveral thread
     def onClick(self):
-        self.close()
-        self.snipWidget.snip()
+        self.close() # will close the main app
+        self.snipWidget.snip() # will open the snip widget to snip the screen
 
+    # this function is runing after unpressed the mouse trigger from snip widget
     def returnSnip(self, img=None):
         # Show processing icon
         self.webView.setHtml('<img src="test.png">',
                              baseUrl=QUrl.fromLocalFile(os.getcwd() + os.path.sep))
 
-        reader = easyocr.Reader(['en'])
-        data_new = reader.readtext('test.png')
+        reader = easyocr.Reader(['en']) # set default language of text in image
+        data_new = reader.readtext('test.png') # read the text from image
 
         list_data = []
         list_result = []
 
         for dats in data_new:
-            list_data.append(dats[-2].replace('x', '*').replace('X', '*').encode('utf-8'))
+            list_data.append(dats[-2].replace('x', '*').replace('X', '*').encode('utf-8')) # append the all data from reader
+
         for final in list_data:
             try:
                 if len(list_data) != 1:
+                    """
+                    check the list if not equal one, we do some more effort
+                    for make it one string 
+                    """
                     final = f'{list_data[0]}{list_data[1]}'.replace('b', '').replace("'", '')
+
+                    # check if aritmatic not in data
                     if ('-', '+', '*', '/') not in final:
                         raise Exception("Gambar tidak di ketahui, coba snip ulang")
-                x = eval(final)
+
+                x = eval(final) # run the code via string
                 list_result.append(f"""Hasil dari perhitungan {str(final).replace('b', '').replace("'", '')} adalah = {str(x)}""")
+
             except:
                 x = "Gambar tidak di ketahui, coba snip ulang"
                 xx = 'Atau coba hilangkan spasi di antara angka dan aritmatik'
@@ -107,7 +119,7 @@ class App(QMainWindow):
                 list_result.append(xx)
                 break
         result = '\n'.join(str(x) for x in list_result)
-        self.textbox.setText(result)
+        self.textbox.setText(result) # show the result to textbox
 
         self.snipButton.setEnabled(True)
         self.retryButton.setEnabled(False)
@@ -120,8 +132,8 @@ class SnipWidget(QMainWindow):
         super().__init__()
         self.parent = parent
 
-        monitos = get_monitors()
-        bboxes = np.array([[m.x, m.y, m.width, m.height] for m in monitos])
+        monitos = get_monitors() # get monitors screen resolution
+        bboxes = np.array([[m.x, m.y, m.width, m.height] for m in monitos]) # get 4 point of the screen
         x, y, _, _ = bboxes.min(0)
         w, h = bboxes[:, [0, 2]].sum(1).max(), bboxes[:, [1, 3]].sum(1).max()
         self.setGeometry(x, y, w-x, h-y)
@@ -131,6 +143,7 @@ class SnipWidget(QMainWindow):
 
         self.mouse = Controller()
 
+    # run the snip app
     def snip(self):
         self.isSnipping = True
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
@@ -160,6 +173,7 @@ class SnipWidget(QMainWindow):
             self.parent.show()
         event.accept()
 
+    # event when mouse pressed
     def mousePressEvent(self, event):
         self.startPos = self.mouse.position
 
@@ -167,10 +181,12 @@ class SnipWidget(QMainWindow):
         self.end = self.begin
         self.update()
 
+    # when we drag the mouse
     def mouseMoveEvent(self, event):
         self.end = event.pos()
         self.update()
 
+    # event when mouse unpressed
     def mouseReleaseEvent(self, event):
         self.isSnipping = False
         QApplication.restoreOverrideCursor()
